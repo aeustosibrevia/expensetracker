@@ -1,52 +1,47 @@
-const expenses = require("../data/data");
+const pool = require("../config/db");
+
 
 async function findAll() {
-    return structuredClone(expenses);
+    const [rows] = await pool.execute(
+        "SELECT * FROM expenses ORDER BY id DESC"
+    );
+    return rows;
 }
 
 async function findById(id) {
-    const current = expenses.find(expense => expense.id === id);
-    return structuredClone(current) ?? null;
+    const [rows] = await pool.execute(
+        "SELECT * FROM expenses WHERE id = ?",
+        [id],
+    );
+    return rows[0] ?? null;
 }
 
 async function create(expense) {
-    const newExpense = {
-        ...expense,
-        id: crypto.randomUUID(),
-    };
-
-    expenses.push(newExpense);
-    return structuredClone(newExpense);
+    const [result] = await pool.execute(
+        "INSERT INTO expenses (description, amount) VALUES (?,?)",
+        [expense.description, expense.amount],
+    );
+    return {id: result.insertId, ...expense};
 }
 
 async function update(id, data) {
-    const currentExpense = await findById(id);
+    await pool.execute(
+        "UPDATE expenses SET description = COALESCE(?, description), amount = COALESCE(?, amount) WHERE id = ?",
+        [data.description ?? null,
+        data.amount ?? null,
+        id],
+    );
 
-    if (!currentExpense) {
-        return false;
-    }
-
-    const updatedExpense = {
-        ...currentExpense,
-        ...data,
-        id: currentExpense.id,
-    };
-
-    const index = expenses.findIndex(expense => expense.id === id);
-
-    expenses.splice(index, 1, updatedExpense);
-    return structuredClone(updatedExpense);
+    return findById(id);
 }
 
 async function remove(id) {
-    const index = expenses.findIndex(expense => expense.id === id);
+    const [result] = await pool.execute(
+        "DELETE FROM expenses WHERE id = ?",
+        [id],
+    );
 
-    if (index !== -1) {
-        expenses.splice(index, 1);
-        return true;
-    }
-
-    return false;
+    return result.affectedRows > 0;
 }
 
 module.exports = { findAll, findById, create, update, remove };
