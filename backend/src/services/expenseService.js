@@ -35,4 +35,8 @@ async function removeExpense(id) {
     return isExpense;
 }
 
-module.exports = { getAllExpenses, getExpenseById, createExpense, updateExpense, removeExpense };
+async function countSummary(){
+    return expenseRepository.summary();
+}
+
+module.exports = { getAllExpenses, getExpenseById, createExpense, updateExpense, removeExpense, countSummary };
