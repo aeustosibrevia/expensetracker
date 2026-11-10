@@ -44,4 +44,9 @@ async function countSummary(req, res) {
     res.status(200).json({ "summary": sum });
 }
 
-module.exports = { getAllExpenses, getExpenseById, createExpense, updateExpense, removeExpense, countSummary };
+async function countMonthSummary(req, res) {
+    const sum = await expenseService.countMonthSummary(req.params.month);
+    res.status(200).json({ "summary": sum });
+}
+
+module.exports = { getAllExpenses, getExpenseById, createExpense, updateExpense, removeExpense, countSummary, countMonthSummary };
