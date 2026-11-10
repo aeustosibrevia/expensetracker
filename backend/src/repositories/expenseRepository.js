@@ -51,4 +51,17 @@ async function summary(){
     return result;
 }
 
-module.exports = { findAll, findById, create, update, remove, summary };
+async function monthSummary(month){
+    const year = new Date().getFullYear();
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 1);
+
+    const [result] = await pool.execute(
+        "SELECT SUM(amount) AS summary FROM expenses WHERE created_at >= ? AND created_at < ?;",
+        [startDate, endDate],
+    );
+    return result[0].summary ?? 0;
+}
+
+module.exports = { findAll, findById, create, update, remove, summary, monthSummary };
