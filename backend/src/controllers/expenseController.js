@@ -39,4 +39,9 @@ async function removeExpense(req, res) {
     res.status(200).json({ message: "Expense deleted successfully." });
 }
 
-module.exports = { getAllExpenses, getExpenseById, createExpense, updateExpense, removeExpense };
+async function countSummary(req, res) {
+    const sum = await expenseService.countSummary();
+    res.status(200).json({ "summary": sum });
+}
+
+module.exports = { getAllExpenses, getExpenseById, createExpense, updateExpense, removeExpense, countSummary };

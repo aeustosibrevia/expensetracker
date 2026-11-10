@@ -44,4 +44,11 @@ async function remove(id) {
     return result.affectedRows > 0;
 }
 
-module.exports = { findAll, findById, create, update, remove };
+async function summary(){
+    const [result] = await pool.execute(
+        "SELECT SUM(amount) FROM expenses",
+    );
+    return result;
+}
+
+module.exports = { findAll, findById, create, update, remove, summary };
